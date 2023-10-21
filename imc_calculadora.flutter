@@ -1,0 +1,104 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Calculadora de IMC'),
+        ),
+        body: IMCCalculator(),
+      ),
+    );
+  }
+}
+
+class IMCCalculator extends StatefulWidget {
+  @override
+  _IMCCalculatorState createState() => _IMCCalculatorState();
+}
+
+class _IMCCalculatorState extends State<IMCCalculator> {
+  TextEditingController nomeController = TextEditingController();
+  TextEditingController pesoController = TextEditingController();
+  TextEditingController alturaController = TextEditingController();
+
+  double imc = 0;
+  String resultado = '';
+
+  void calcularIMC() {
+    try {
+      double peso = double.parse(pesoController.text);
+      double altura = double.parse(alturaController.text);
+
+      if (altura <= 0 || peso <= 0) {
+        throw Exception("Altura e peso devem ser maiores que zero.");
+      }
+
+      double calculoImc = peso / (altura * altura);
+      setState(() {
+        imc = calculoImc;
+        resultado = interpretarIMC(imc);
+      });
+    } catch (e) {
+      setState(() {
+        imc = 0;
+        resultado = "Erro: $e";
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        children: <Widget>[
+          TextField(
+            controller: nomeController,
+            decoration: InputDecoration(labelText: 'Nome'),
+          ),
+          TextField(
+            controller: pesoController,
+            decoration: InputDecoration(labelText: 'Peso (kg)'),
+            keyboardType: TextInputType.number,
+          ),
+          TextField(
+            controller: alturaController,
+            decoration: InputDecoration(labelText: 'Altura (m)'),
+            keyboardType: TextInputType.number,
+          ),
+          RaisedButton(
+            child: Text('Calcular IMC'),
+            onPressed: calcularIMC,
+          ),
+          Text('${nomeController.text}, seu IMC é: ${imc.toStringAsFixed(2)}'),
+          Text('Classificação: $resultado'),
+        ],
+      ),
+    );
+  }
+}
+
+String interpretarIMC(double imc) {
+  if (imc < 16) {
+    return "Magreza grave";
+  } else if (imc < 17) {
+    return "Magreza moderada";
+  } else if (imc < 18.5) {
+    return "Magreza leve";
+  } else if (imc < 25) {
+    return "Saudável";
+  } else if (imc < 30) {
+    return "Sobrepeso";
+  } else if (imc < 35) {
+    return "Obesidade Grau I";
+  } else if (imc < 40) {
+    return "Obesidade Grau II (severa)";
+  } else {
+    return "Obesidade Grau III (mórbida)";
+  }
+}
